@@ -1,0 +1,20 @@
+[Unit]
+Description=Lumen Fintech Production Ledger Core Server
+After=network.target
+
+[Service]
+Type=simple
+User=arch
+WorkingDirectory=/home/arch/Documents/Codex/2026-09-08/lumen-fintech-system
+ExecStart=/usr/bin/node server/index.js
+Restart=on-failure
+RestartSec=5s
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOST=127.0.0.1
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=lumen-fintech
+
+[Install]
+WantedBy=multi-user.target

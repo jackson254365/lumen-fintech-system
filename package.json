@@ -1,0 +1,20 @@
+{
+  "name": "lumen-fintech-system",
+  "version": "1.0.0",
+  "description": "This is the functional local-first version of the Lumen fintech workspace. The original visual prototype remains at:",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node tests/ledger.test.js && node tests/audit-chain.test.js && node tests/statement-parser.test.js && node tests/research-engine.test.js && node tests/api.test.js && node tests/rails.test.js",
+    "seed": "node -e \"require('./server/middleware/auth-guard').ensureDefaultUser(); console.log('Database seeded.');\""
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "ethers": "^6.17.0",
+    "express": "^5.2.1",
+    "multer": "^2.4.0"
+  }
+}

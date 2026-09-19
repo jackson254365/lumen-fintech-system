@@ -1,33 +1,34 @@
-# Lumen Finance · Production Fintech System & Research Platform
+# Lumen Finance · Production Rust Fintech System & Web3 Engine
 
-[![CI Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
+[![CI Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/rust_integration_test.rs)
+[![Engine](https://img.shields.io/badge/engine-Rust%20(Axum%20%7C%20Tokio)-orange.svg)](src/)
 [![Architecture](https://img.shields.io/badge/architecture-GAAP%20Double--Entry-blue.svg)](FINTECH_ARCHITECTURE.md)
-[![Audit](https://img.shields.io/badge/audit-Cryptographic%20SHA--256-teal.svg)](server/ledger/audit-chain.js)
-[![Research](https://img.shields.io/badge/research-Monte%20Carlo%20%7C%20Holt--Winters-purple.svg)](RESEARCH_METHODOLOGY.md)
+[![Audit](https://img.shields.io/badge/audit-Cryptographic%20SHA--256-teal.svg)](src/ledger/audit_chain.rs)
+[![Precision](https://img.shields.io/badge/precision-128--bit%20rust__decimal-purple.svg)](src/ledger/core.rs)
 
-Lumen Finance is an enterprise-grade, local-first personal and commercial finance system. Built on a **GAAP/IFRS-compliant double-entry accounting ledger** with a **cryptographic SHA-256 hash-chained audit trail**, Lumen eliminates the data loss and reconciliation errors typical of naive budgeting apps. It includes a computational finance research suite featuring **Holt-Winters cash flow forecasting**, **Monte Carlo runway stress-testing**, **bank statement deduplication**, and a **Python Research SDK**.
+Lumen Finance is an enterprise-grade, local-first personal and commercial finance system built in **Rust**. Built on a **GAAP/IFRS-compliant double-entry accounting ledger** operating on **128-bit fixed-point precision (`rust_decimal`)** with a **cryptographic SHA-256 hash-chained audit trail**, Lumen eliminates floating-point rounding errors and reconciliation drift.
+
+It features a multi-rail payment system (**M-Pesa**, **Airtel Money**, **ISO 20022 SWIFT/SEPA/ACH Bank Wires**, **Celo EVM Web3 Crypto Rail**, and **Fintech Gateways**) and a computational finance research suite featuring **cash flow forecasting**, **Monte Carlo runway stress-testing**, **bank statement deduplication**, and a **Python Research SDK**.
 
 ---
 
 ## ⚡ Quick Start
 
 ### 1. Prerequisites
-- **Node.js**: v20+ or v22+
-- **Python**: v3.8+ (for research scripts and Jupyter notebooks)
+- **Rust**: `1.80+` (edition 2021)
+- **Node.js**: `v20+` (optional, for frontend static web client / legacy scripts)
+- **Python**: `v3.8+` (for research SDK)
 
-### 2. Installation & Run
+### 2. Run Rust Server
 ```bash
 # Clone or navigate to the directory
 cd /home/arch/Documents/Codex/2026-09-08/lumen-fintech-system
 
-# Install dependencies (Express, CORS, Multer)
-npm install
+# Run automated Rust integration tests
+cargo test
 
-# Run automated test suite (verifies accounting invariants and audit chain)
-npm test
-
-# Start production server
-npm start
+# Launch production server in release mode
+cargo run --release
 ```
 Open **`http://localhost:3000`** in your browser.
 
@@ -37,7 +38,7 @@ Open **`http://localhost:3000`** in your browser.
 
 Run with one command using Docker Compose:
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
 Your SQLite database and cryptographic ledger state persist automatically in the `lumen-data` volume.
 
@@ -45,160 +46,61 @@ Your SQLite database and cryptographic ledger state persist automatically in the
 
 ## 📐 Core Capabilities
 
-### 1. Double-Entry Accounting Core
+### 1. Double-Entry Accounting Core in Rust
+- **128-bit Fixed-Point Precision:** Uses `rust_decimal` for zero floating-point drift.
 - **Mathematical debit-credit conservation:** Every transaction enforces $\sum \text{Debits} \equiv \sum \text{Credits}$.
 - **Chart of Accounts:** Assets, Liabilities, Equity, Revenue, and Expense classes.
 - **GAAP Financial Statements:** Real-time generation of Trial Balance, Balance Sheet, and Income Statement (P&L).
-- **Overdraft Protection:** Prevents asset accounts from dropping below zero without an authorized credit facility.
 
 ### 2. Cryptographic SHA-256 Audit Trail
-- Each journal entry computes $H_n = \text{SHA256}(H_{n-1} \parallel \text{EntryData})$.
+- Each journal entry computes $H_n = \text{SHA256}(H_{n-1} \parallel \text{Seq} \parallel \text{EntryID} \parallel \text{Date} \parallel \text{Description} \parallel \text{SortedPostingsJSON})$.
 - Provides zero-knowledge mathematical proof of data integrity.
-- Any manual database tampering or row modification immediately flags the corrupted sequence block.
+- Any manual database tampering immediately flags the corrupted sequence block.
 
-### 3. Bank Statement Ingestion Engine
-- **Universal Format Support:** Parses CSV (Chase, Monzo, Starling, Revolut) and banking OFX/QFX files.
-- **Cryptographic Deduplication:** Deterministic SHA-256 fingerprinting prevents duplicate entries across overlapping monthly statements.
-- **Rule-Based & Heuristic Categorization:** Categorizes payees with instant icon and tone mapping.
+### 3. Multi-Rail Payment Gateway & Celo Web3 Crypto Engine
+- **M-Pesa Rail**: Safaricom Daraja STK Push prompt & automated B2C payouts.
+- **Airtel Money Rail**: East African mobile money collections and disbursements.
+- **ISO 20022 Bank Wires**: SWIFT, SEPA, and ACH wire transfers.
+- **Celo EVM Web3 Crypto Engine**: On-chain cUSD, CELO, USDC, BTC, and ETH deposits/withdrawals, min deposit validation ($0.01 limit), on-ramp/off-ramp buy & sell orders, and DEX swaps.
+- **Fintech Gateways**: Wise, Revolut, PayPal, and Paystack P2P & payment links.
 
-### 4. Computational Finance Research Core
-- **Time-Series Cash Flow Forecasting:** Holt-Winters Double Exponential Smoothing with dynamic 80% and 95% confidence bands.
-- **Monte Carlo Runway Stress Simulation:** Runs 1,000 stochastic trajectories modeling income shocks (-50% to +20%), inflation variance, and Poisson emergency expenses.
-- **Financial Health Index (0-100):** Algorithmic scoring across 5 macroeconomic pillars (Savings Rate, Emergency Runway, Debt Leverage, Budget Discipline, Income Stability).
-- **Recurring Subscription Detection:** Detects cadences and annual burn rates for fixed bills.
-- **Outlier Spending Detection:** Rolling Z-score and IQR anomaly detection.
+### 4. Bank Statement Ingestion Engine
+- Parses CSV (Chase, Monzo, Starling, Revolut) and banking OFX/QFX files.
+- Exact SHA-256 fingerprinting + fuzzy temporal deduplication.
 
----
-
-## 🐍 Python Research SDK
-
-Empowers quantitative analysts, econometricians, and data scientists to stream live ledger data directly into Pandas:
-
-```python
-from sdk.research_client import LumenClient
-
-client = LumenClient(base_url="http://localhost:3000")
-
-# 1. Verify cryptographic ledger
-audit = client.verify_cryptographic_audit()
-print("Audit:", audit["audit"]["message"])
-
-# 2. Run Monte Carlo stress simulation
-sim = client.run_monte_carlo_simulation(
-    iterations=1000,
-    horizon_months=12,
-    income_shock_pct=-20.0,
-    emergency_shock_amount=3000.0
-)
-print("Solvency Probability:", sim["simulation"]["results"]["solvencyProbability"], "%")
-
-# 3. Stream transactions into pandas DataFrame
-df = client.get_transactions_dataframe()
-print(df.groupby("category")["amount"].sum())
-```
+### 5. Computational Finance Research Engine
+- **Cash Flow Forecasting**: 30/60/90-day trend projections.
+- **Monte Carlo Runway Stress-Testing**: Stochastic Box-Muller simulation modeling revenue volatility, expense shocks, and insolvency probability.
+- **Financial Health Score**: Altman Z-Score liquidity diagnostic engine (0-100 rating).
+- **Fraud Anomaly Detection**: Z-Score outlier detection for unexpected cash drain.
 
 ---
 
-## 📡 REST API Reference
-
-All requests accept and return JSON. Supports `x-api-key: your_key` and `Idempotency-Key` headers.
+## 🛠️ API Reference
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/system/health` | System health check, SQLite metrics, and uptime |
+| `GET` | `/api/system/health` | Rust system health check, SQLite metrics, and uptime |
 | `GET` | `/api/accounts` | Connected accounts with live calculated balances |
 | `POST` | `/api/accounts` | Create account with opening equity balance |
-| `GET` | `/api/transactions` | Query and filter transactions (`type`, `search`, `limit`) |
+| `GET` | `/api/transactions` | Query and filter transactions (`limit`, `search`, `category`) |
 | `POST` | `/api/transactions` | Post spending or deposit to double-entry ledger |
 | `POST` | `/api/transactions/transfer` | Execute inter-account balanced transfer |
-| `GET` | `/api/budgets` | Monthly envelope budgets with current spend |
 | `GET` | `/api/ledger/trial-balance` | GAAP trial balance verifying debit-credit equilibrium |
 | `GET` | `/api/ledger/verify-audit` | Verify SHA-256 cryptographic audit chain from genesis |
-| `POST` | `/api/statements/parse` | Parse and deduplicate CSV/OFX statement upload |
-| `POST` | `/api/statements/commit` | Commit reviewed statement batch to ledger |
-| `GET` | `/api/research/forecast` | Holt-Winters cash flow forecast with confidence bounds |
-| `POST` | `/api/research/monte-carlo` | Run stochastic runway simulation with stress parameters |
-| `GET` | `/api/research/health-score` | 5-Pillar econometric health score & recommendations |
-| `GET` | `/api/research/subscriptions` | Detected recurring services and annual burn rates |
-| `GET` | `/api/research/anomalies` | Statistical spending outlier detection |
-| `GET` | `/api/system/export` | Download full ledger JSON backup |
-
----
-
-## 📂 Architecture & Directory Structure
-
-```
-lumen-fintech-system/
-├── server/
-│   ├── index.js                  # Production Express REST API entrypoint
-│   ├── config.js                 # Configuration constants & environment flags
-│   ├── db.js                     # SQLite WAL mode adapter with SAVEPOINT nesting
-│   ├── schema.sql                # Double-entry ledger schema & indexes
-│   ├── ledger/
-│   │   ├── ledger-core.js        # Double-entry bookkeeping engine
-│   │   ├── chart-of-accounts.js  # 5 standard accounting classifications
-│   │   └── audit-chain.js        # SHA-256 cryptographic hash-chaining verification
-│   ├── statement-engine/
-│   │   ├── parser.js             # CSV & OFX multi-bank statement parser
-│   │   ├── deduplicator.js       # SHA-256 fingerprinting deduplicator
-│   │   └── categorizer.js        # Rule-based & heuristic payee categorizer
-│   ├── research-engine/
-│   │   ├── forecast.js           # Holt-Winters cash flow forecasting
-│   │   ├── monte-carlo.js        # 1,000-iteration stochastic runway simulator
-│   │   ├── health-score.js       # Econometric health scoring engine (0-100)
-│   │   ├── subscriptions.js      # Recurring bill & subscription detector
-│   │   ├── anomaly-detector.js   # Rolling Z-score anomaly detector
-│   │   └── currency.js           # Multi-currency cross-rate converter
-│   ├── routes/                   # Modular REST API route handlers
-│   └── middleware/               # Auth guard, idempotency, and error handling
-├── client / frontend
-│   ├── index.html                # Upgraded responsive UI with Lucide icons
-│   ├── styles.css                # Polished design system with research widgets
-│   └── app.js                    # Reactive frontend with live API client
-├── tests/
-│   ├── ledger.test.js            # Invariant, overdraft, and balance tests
-│   ├── audit-chain.test.js       # Cryptographic integrity and tamper detection tests
-│   ├── statement-parser.test.js  # CSV/OFX parsing and deduplication tests
-│   ├── research-engine.test.js   # Forecast and Monte Carlo mathematical tests
-│   └── api.test.js               # E2E REST API and idempotency tests
-├── sdk/
-│   └── research_client.py        # Python SDK for data scientists
-├── Dockerfile                    # Multi-stage production container build
-├── docker-compose.yml            # Container orchestration with volume persistence
-├── lumen.service                 # Linux systemd service unit
-├── FINTECH_ARCHITECTURE.md       # Technical ledger specifications
-└── RESEARCH_METHODOLOGY.md       # Mathematical formulations for research models
-```
-
----
-
-## 🧪 Testing
-
-Execute the comprehensive test suite verifying accounting invariants, cryptographic hashing, statement parsing, and Monte Carlo algorithms:
-```bash
-npm test
-```
-Result:
-```
-✓ Correctly rejected unbalanced journal entry
-✓ Income recorded and balance accurately updated
-✓ Spending deducted and balance accurately updated
-✓ Overdraft protection enforced
-✓ Inter-account transfer balanced and executed
-✓ Trial Balance verified: $1450 Debits === $1450 Credits
-✓ Cryptographic hash chain verified (3 entries)
-✓ Tamper successfully detected at sequence #2
-✓ Standard 3-column CSV parsed accurately
-✓ Semicolon-delimited dual Debit/Credit CSV parsed accurately
-✓ Standard banking OFX/QFX statement parsed accurately
-✓ Deduplication fingerprints are deterministic and collision-resistant
-✓ Holt-Winters Double Exponential Smoothing generated trending forecast with confidence bands
-✓ Monte Carlo simulation executed 500 stochastic paths (Solvency: 100%, Rating: Ultra-Resilient (AAA))
-✓ Financial Health Index calculated: 99/100 (Grade: A+) across 5 econometric pillars
-✓ Idempotency-Key successfully prevented double-spending
-```
-
----
-
-## 📄 License
-MIT License. Built for production personal finance, commercial ledger compliance, and quantitative financial research.
+| `POST` | `/api/rails/mpesa/stk-push` | Dispatch M-Pesa STK Push prompt |
+| `POST` | `/api/rails/mpesa/b2c` | Send M-Pesa B2C payout |
+| `POST` | `/api/rails/airtel/collection` | Dispatch Airtel Money collection prompt |
+| `POST` | `/api/rails/airtel/disbursement` | Send Airtel Money disbursement |
+| `POST` | `/api/rails/bank/wire` | Initiate SWIFT / SEPA / ACH wire transfer |
+| `GET` | `/api/rails/crypto/prices` | Get real-time crypto prices (cUSD, CELO, USDC, BTC, ETH) |
+| `GET` | `/api/rails/crypto/wallet` | Get or create Web3 wallet address |
+| `POST` | `/api/rails/crypto/receive` | Receive on-chain crypto deposit |
+| `POST` | `/api/rails/crypto/send` | Send outward on-chain crypto transfer |
+| `POST` | `/api/rails/crypto/buy` | Fiat on-ramp crypto buy order |
+| `POST` | `/api/rails/crypto/sell` | Crypto off-ramp sell order |
+| `POST` | `/api/rails/crypto/swap` | Execute instant crypto swap |
+| `POST` | `/api/statements/parse` | Parse CSV/OFX statement upload |
+| `GET` | `/api/research/forecast` | Cash flow projections |
+| `POST` | `/api/research/monte-carlo` | Run Monte Carlo runway stress simulation |
+| `GET` | `/api/research/health-score` | Calculate 0-100 financial health score |

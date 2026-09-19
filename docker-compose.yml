@@ -10,11 +10,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
       - PORT=3000
       - HOST=0.0.0.0
       - DB_PATH=/app/data/lumen.sqlite
-      - JWT_SECRET=lumen-production-secure-key-replace-in-env
+      - RUST_LOG=info
     volumes:
       - lumen-data:/app/data
     healthcheck:

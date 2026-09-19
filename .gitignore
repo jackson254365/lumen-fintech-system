@@ -1,6 +1,10 @@
 # Node dependencies
 node_modules/
 
+# Rust build target
+/target
+target/
+
 # Local SQLite databases & data files
 data/*.sqlite
 data/*.sqlite-journal

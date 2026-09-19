@@ -4,10 +4,11 @@
   "description": "This is the functional local-first version of the Lumen fintech workspace. The original visual prototype remains at:",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "node --watch server/index.js",
-    "test": "node tests/ledger.test.js && node tests/audit-chain.test.js && node tests/statement-parser.test.js && node tests/research-engine.test.js && node tests/api.test.js && node tests/rails.test.js",
-    "seed": "node -e \"require('./server/middleware/auth-guard').ensureDefaultUser(); console.log('Database seeded.');\""
+    "start": "cargo run --release",
+    "dev": "cargo run",
+    "build": "cargo build --release",
+    "test": "cargo test && node tests/ledger.test.js && node tests/audit-chain.test.js && node tests/statement-parser.test.js && node tests/research-engine.test.js && node tests/api.test.js && node tests/rails.test.js",
+    "seed": "cargo run --bin lumen-server"
   },
   "keywords": [],
   "type": "commonjs",

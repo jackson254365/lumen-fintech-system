@@ -135,3 +135,17 @@ fn test_computational_research_engine() {
     let health = calculate_financial_health_score(&conn, "default_user").unwrap();
     assert!(health.overall_score > 0);
 }
+
+#[test]
+fn test_user_auth_and_admin_system() {
+    let pool = init_db(":memory:").expect("Failed to create DB");
+    let conn = pool.get().unwrap();
+
+    let user_count: i64 = conn.query_row("SELECT COUNT(*) FROM users", [], |r| r.get(0)).unwrap();
+    assert!(user_count >= 2, "Default users must be seeded");
+
+    let admin_exists: bool = conn
+        .query_row("SELECT EXISTS(SELECT 1 FROM users WHERE role = 'admin')", [], |r| r.get(0))
+        .unwrap();
+    assert!(admin_exists, "Admin user must exist in users table");
+}

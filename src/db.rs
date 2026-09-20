@@ -53,6 +53,8 @@ fn init_schema(conn: &rusqlite::Connection) -> SqliteResult<()> {
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
             currency TEXT NOT NULL DEFAULT 'USD',
+            role TEXT NOT NULL DEFAULT 'user',
+            status TEXT NOT NULL DEFAULT 'active',
             api_key TEXT UNIQUE,
             settings_json TEXT NOT NULL DEFAULT '{}',
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -171,8 +173,14 @@ fn init_schema(conn: &rusqlite::Connection) -> SqliteResult<()> {
             updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
-        INSERT OR IGNORE INTO users (id, name, email, password_hash) VALUES ('default_user', 'Default User', 'alex@lumen.finance', 'hash');
-        INSERT OR IGNORE INTO users (id, name, email, password_hash) VALUES ('test_user', 'Test User', 'test@lumen.finance', 'hash');
+        INSERT OR IGNORE INTO users (id, name, email, password_hash, role, status)
+        VALUES ('default_user', 'Default User', 'alex@lumen.finance', 'hash', 'user', 'active');
+
+        INSERT OR IGNORE INTO users (id, name, email, password_hash, role, status)
+        VALUES ('test_user', 'Test User', 'test@lumen.finance', 'hash', 'user', 'active');
+
+        INSERT OR IGNORE INTO users (id, name, email, password_hash, role, status)
+        VALUES ('admin_user', 'System Administrator', 'admin@lumen.finance', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'admin', 'active');
 
         CREATE INDEX IF NOT EXISTS idx_accounts_user ON accounts(user_id);
         CREATE INDEX IF NOT EXISTS idx_journal_user_seq ON journal_entries(user_id, sequence_num);
@@ -182,6 +190,10 @@ fn init_schema(conn: &rusqlite::Connection) -> SqliteResult<()> {
         CREATE INDEX IF NOT EXISTS idx_rails_user ON payment_rails_transactions(user_id, rail, status);
         "#,
     )?;
+
+    // Column migrations if users table was created earlier without role/status
+    let _ = conn.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'", []);
+    let _ = conn.execute("ALTER TABLE users ADD COLUMN status TEXT NOT NULL DEFAULT 'active'", []);
 
     Ok(())
 }

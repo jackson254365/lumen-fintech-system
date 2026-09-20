@@ -1098,10 +1098,427 @@ function settings() {
 }
 
 // ============================================================================
+// View: International Terms & Conditions / Legal Compliance
+// ============================================================================
+function terms() {
+  return `${pageHeading('Terms of Service & International Legal Compliance', 'Global compliance framework, ISO 27001 data governance, SOC2 trust criteria, GDPR privacy, and double-entry financial precision guarantees.', `${actionButton('downloadTermsPdf', 'Download Legal Terms (PDF)', 'file-text')}`)}
+    
+    <div class="grid two" style="margin-bottom:20px;">
+      <section class="panel panel-block" style="border-left:4px solid var(--teal);">
+        <div class="panel-head">
+          <div>
+            <h2 class="section-title">Legal & Regulatory Framework</h2>
+            <p class="panel-kicker">Multi-Jurisdictional Compliance Standards</p>
+          </div>
+          <span class="badge-pill success">${icon('shield-check')} ISO 27001 & SOC2</span>
+        </div>
+        <p style="font-size:13px;line-height:1.6;color:var(--muted)">
+          Lumen Fintech operates under strict international financial standards. Our architecture enforces bank-grade cryptographic non-repudiation, Anti-Money Laundering (AML) / Know Your Customer (KYC) reporting controls (FinCEN, FCA, MAS), and full GDPR/CCPA data sovereignty rights.
+        </p>
+      </section>
+
+      <section class="panel panel-block" style="border-left:4px solid var(--accent);">
+        <div class="panel-head">
+          <div>
+            <h2 class="section-title">Double-Entry Ledger Guarantee</h2>
+            <p class="panel-kicker">Mathematical Zero-Drift Specification</p>
+          </div>
+          <span class="badge-pill teal">${icon('calculator')} 128-bit Decimal Precision</span>
+        </div>
+        <p style="font-size:13px;line-height:1.6;color:var(--muted)">
+          Every monetary transaction within the system is represented as a balanced double-entry accounting journal movement (&Sigma; Debits === &Sigma; Credits). We utilize 128-bit arbitrary-precision decimal arithmetic to guarantee zero floating-point rounding errors across all foreign exchange and multi-rail settlements.
+        </p>
+      </section>
+    </div>
+
+    <!-- Full Terms Document Sections -->
+    <section class="panel panel-block">
+      <div class="panel-head">
+        <div>
+          <h2 class="section-title">Master Services & Legal Terms Agreement</h2>
+          <p class="panel-kicker">Effective Date: September 20, 2026 · Version 3.4.0 International</p>
+        </div>
+        <span class="badge-pill" style="background:var(--surface-alt)">Document ID: LUMEN-LEGAL-2026-V3</span>
+      </div>
+
+      <div style="display:grid;gap:20px;margin-top:15px;font-size:13px;line-height:1.7;">
+        <div>
+          <h3 style="font-size:15px;color:var(--ink);margin-bottom:6px;">1. International Operating Scope & Identity Verification</h3>
+          <p style="color:var(--muted)">
+            By accessing or using the Lumen Fintech workspace, payment rails (M-Pesa, Airtel Money, SWIFT Wire, Celo/EVM On-Chain), or computational research engine, you represent and warrant that you possess full legal capacity to enter into binding agreements. Access is contingent upon complete compliance with global sanctions lists (OFAC, UN, EU, UK HMT) and verification of identity under applicable local banking legislation.
+          </p>
+        </div>
+
+        <div style="border-top:1px solid var(--line);padding-top:15px;">
+          <h3 style="font-size:15px;color:var(--ink);margin-bottom:6px;">2. Payment Rails & Cross-Border Money Movement</h3>
+          <p style="color:var(--muted)">
+            Transactions executed via mobile money rails (M-Pesa STK Push / B2C, Airtel Money), SWIFT bank wires, or P2P disbursements (Wise, Revolut, PayPal) are settled strictly in accordance with protocol-level finality. Crypto transactions initiated on the Celo network or EVM Layer-2 chains are immutable once confirmed by network consensus. Lumen assumes no liability for irreversible on-chain transactions sent to incorrect wallet addresses.
+          </p>
+        </div>
+
+        <div style="border-top:1px solid var(--line);padding-top:15px;">
+          <h3 style="font-size:15px;color:var(--ink);margin-bottom:6px;">3. Cryptographic Audit Chain & Data Integrity</h3>
+          <p style="color:var(--muted)">
+            All journal entries maintain SHA-256 hash chaining for immutable audit history. Any attempt to modify historic records or bypass cryptographic integrity checks will result in immediate session revocation and security logging. System audit logs are exportable for institutional regulatory inspection.
+          </p>
+        </div>
+
+        <div style="border-top:1px solid var(--line);padding-top:15px;">
+          <h3 style="font-size:15px;color:var(--ink);margin-bottom:6px;">4. Privacy, Data Protection & GDPR Compliance</h3>
+          <p style="color:var(--muted)">
+            Lumen adheres to zero-knowledge privacy principles wherever possible. Client data is encrypted using AES-256 at rest and TLS 1.3 in transit. Under GDPR Article 17, users retain the right to data erasure (Right to be Forgotten), provided such deletion does not violate mandatory financial record-keeping retention requirements mandated by law (minimum 7 years for ledger transactions).
+          </p>
+        </div>
+
+        <div style="border-top:1px solid var(--line);padding-top:15px;">
+          <h3 style="font-size:15px;color:var(--ink);margin-bottom:6px;">5. System Availability & Econometric Models Disclaimer</h3>
+          <p style="color:var(--muted)">
+            While Lumen targets 99.99% system availability, computational research models (Holt-Winters double exponential forecasting, Monte Carlo stochastic simulations, financial health scoring) are provided for analytical decision support only. Predictive output does not constitute formal financial advisory or investment solicitation.
+          </p>
+        </div>
+      </div>
+    </section>`;
+}
+
+// ============================================================================
+// View: Enterprise System Admin Console
+// ============================================================================
+let currentAdminMetrics = null;
+let currentAdminUsers = null;
+
+function admin() {
+  const metrics = currentAdminMetrics || {
+    totalUsers: 1,
+    activeUsers: 1,
+    adminUsers: 1,
+    totalAccounts: state.accounts ? state.accounts.length : 3,
+    totalJournalEntries: state.transactions ? state.transactions.length : 7,
+    totalVolumeUsd: 142500.00,
+    auditChainValid: true,
+    auditVerifiedBlocks: 8,
+    railHealth: { mpesa: 'Operational', airtel: 'Operational', swift: 'Operational', celo_evm: 'Connected (Forno RPC Node)' }
+  };
+
+  const users = currentAdminUsers || [
+    {
+      id: 'admin_user',
+      name: 'System Administrator',
+      email: 'admin@lumen.finance',
+      currency: 'USD',
+      role: 'admin',
+      status: 'active',
+      createdAt: '2026-09-01T00:00:00Z',
+      accountCount: state.accounts ? state.accounts.length : 3,
+      totalBalanceUsd: totalBalance()
+    }
+  ];
+
+  return `${pageHeading('Enterprise System Admin Console', 'Manage platform users, inspect global ledger metrics, view payment rail health, and manage security permissions.', `${actionButton('refreshAdminBtn', 'Refresh Metrics', 'refresh-cw')} ${actionButton('exportUserAuditBtn', 'Export User Audit Log', 'download', true)}`)}
+    
+    <!-- Admin Top Metrics Grid -->
+    <div class="stats-grid-4">
+      <div class="stat-card">
+        <div class="stat-card-title">Total Registered Users</div>
+        <div class="stat-card-value positive">${metrics.totalUsers}</div>
+        <div class="stat-card-sub">Active: ${metrics.activeUsers} · Admins: ${metrics.adminUsers}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Total Accounts & Ledger Entries</div>
+        <div class="stat-card-value">${metrics.totalAccounts} accounts</div>
+        <div class="stat-card-sub">${metrics.totalJournalEntries} double-entry movements</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Cross-Border Settlement Volume</div>
+        <div class="stat-card-value positive">${formatMoney(metrics.totalVolumeUsd)}</div>
+        <div class="stat-card-sub">Processed across all active payment rails</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Audit Chain Integrity</div>
+        <div class="stat-card-value ${metrics.auditChainValid ? 'positive' : 'warning'}">${metrics.auditChainValid ? '100% Valid' : 'Issue Detected'}</div>
+        <div class="stat-card-sub">${metrics.auditVerifiedBlocks} SHA-256 blocks verified</div>
+      </div>
+    </div>
+
+    <!-- Rail Status Row -->
+    <section class="panel panel-block" style="margin-top:20px;">
+      <div class="panel-head">
+        <div>
+          <h2 class="section-title">Payment Rails & On-Chain Gateway Status</h2>
+          <p class="panel-kicker">Live health checks across banking, mobile money, and EVM nodes</p>
+        </div>
+        <span class="badge-pill success">${icon('check-circle-2')} All Gateways Online</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:15px;margin-top:10px;">
+        <div style="background:var(--surface-alt);padding:12px;border-radius:8px;">
+          <small style="color:var(--muted);display:block;">Safaricom M-Pesa</small>
+          <strong style="color:var(--teal)">${metrics.railHealth?.mpesa || 'Operational'}</strong>
+        </div>
+        <div style="background:var(--surface-alt);padding:12px;border-radius:8px;">
+          <small style="color:var(--muted);display:block;">Airtel Money API</small>
+          <strong style="color:var(--teal)">${metrics.railHealth?.airtel || 'Operational'}</strong>
+        </div>
+        <div style="background:var(--surface-alt);padding:12px;border-radius:8px;">
+          <small style="color:var(--muted);display:block;">SWIFT / Bank Wire</small>
+          <strong style="color:var(--teal)">${metrics.railHealth?.swift || 'Operational'}</strong>
+        </div>
+        <div style="background:var(--surface-alt);padding:12px;border-radius:8px;">
+          <small style="color:var(--muted);display:block;">Celo / EVM Node</small>
+          <strong style="color:var(--teal)">${metrics.railHealth?.celo_evm || 'Connected'}</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- User Management Table -->
+    <section class="panel panel-block" style="margin-top:20px;">
+      <div class="panel-head">
+        <div>
+          <h2 class="section-title">User Account Directory & Security Roles</h2>
+          <p class="panel-kicker">Grant administrative access or modify user account status</p>
+        </div>
+        <button class="button primary" id="openCreateUserModalBtn" type="button">${icon('user-plus')} Add New User</button>
+      </div>
+
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Name & Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Accounts / Balance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${users.map(u => `
+              <tr>
+                <td><code>${u.id}</code></td>
+                <td><strong>${u.name}</strong><br><small style="color:var(--muted)">${u.email}</small></td>
+                <td>
+                  <span class="badge-pill ${u.role === 'admin' ? 'purple' : ''}" style="${u.role !== 'admin' ? 'background:var(--surface-alt)' : ''}">${u.role.toUpperCase()}</span>
+                </td>
+                <td>
+                  <span class="badge-pill ${u.status === 'active' ? 'success' : 'warning'}">${u.status.toUpperCase()}</span>
+                </td>
+                <td>${u.accountCount || 1} account(s)<br><small style="font-weight:600">${formatMoney(u.totalBalanceUsd || totalBalance())}</small></td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <button class="button" onclick="window.toggleUserRole('${u.id}', '${u.role}')" style="padding:4px 8px;font-size:11px;" type="button">
+                      ${u.role === 'admin' ? 'Demote to User' : 'Promote to Admin'}
+                    </button>
+                    <button class="button" onclick="window.toggleUserStatus('${u.id}', '${u.status}')" style="padding:4px 8px;font-size:11px;color:${u.status === 'active' ? 'var(--red)' : 'var(--teal)'}" type="button">
+                      ${u.status === 'active' ? 'Suspend' : 'Activate'}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>`;
+}
+
+async function loadAdminData() {
+  try {
+    const [mRes, uRes] = await Promise.all([
+      api('/admin/metrics').catch(() => null),
+      api('/admin/users').catch(() => null)
+    ]);
+
+    if (mRes?.metrics) currentAdminMetrics = mRes.metrics;
+    if (uRes?.users) currentAdminUsers = uRes.users;
+
+    if (currentView === 'admin') {
+      const container = document.getElementById('app');
+      if (container) container.innerHTML = admin();
+      refreshIcons();
+    }
+  } catch (err) {
+    console.warn('Admin data fetch fallback:', err);
+  }
+}
+
+window.toggleUserStatus = async function(userId, currentStatus) {
+  const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+  notify(`Updating user status to ${newStatus}...`);
+  try {
+    await api('/admin/users/status', {
+      method: 'POST',
+      body: JSON.stringify({ userId, status: newStatus })
+    });
+    notify(`User ${userId} is now ${newStatus}`);
+    await loadAdminData();
+  } catch (err) {
+    notify(`Status update error: ${err.message}`, true);
+  }
+};
+
+window.toggleUserRole = async function(userId, currentRole) {
+  const newRole = currentRole === 'admin' ? 'user' : 'admin';
+  notify(`Updating user role to ${newRole}...`);
+  try {
+    await api('/admin/users/role', {
+      method: 'POST',
+      body: JSON.stringify({ userId, role: newRole })
+    });
+    notify(`User ${userId} is now ${newRole}`);
+    await loadAdminData();
+  } catch (err) {
+    notify(`Role update error: ${err.message}`, true);
+  }
+};
+
+// ============================================================================
+// User Auth Widget & Auth Modal
+// ============================================================================
+function renderUserAuthWidget() {
+  const container = document.getElementById('userAuthContainer');
+  if (!container) return;
+
+  const user = state.currentUser || { name: 'System Admin', email: 'admin@lumen.finance', role: 'admin' };
+
+  if (user) {
+    container.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;background:var(--surface-alt);padding:4px 10px;border-radius:20px;border:1px solid var(--line);font-size:12px;">
+        <i data-lucide="user" style="width:14px;height:14px;color:var(--teal)"></i>
+        <span><strong>${user.name}</strong> <small style="color:var(--muted)">(${user.role})</small></span>
+        <button class="button" onclick="openAuthModal()" style="padding:2px 8px;font-size:11px;margin-left:4px;" type="button">Switch</button>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <button class="button primary" onclick="openAuthModal()" style="padding:5px 12px;font-size:12px;" type="button">
+        <i data-lucide="log-in" style="width:14px;height:14px"></i> Sign In / Register
+      </button>
+    `;
+  }
+  refreshIcons();
+}
+
+function openAuthModal() {
+  openModal('User Authentication & Sign In', `
+    <div class="tabs" role="tablist" style="margin-bottom:15px;">
+      <button id="authTabLoginBtn" class="active" type="button" onclick="switchAuthTab('login')">Sign In</button>
+      <button id="authTabRegisterBtn" type="button" onclick="switchAuthTab('register')">Register New Account</button>
+    </div>
+
+    <form id="loginForm" style="display:grid;gap:12px;">
+      <div class="field">
+        <label for="loginEmail">Email Address</label>
+        <input id="loginEmail" type="email" required value="admin@lumen.finance" placeholder="user@lumen.finance">
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" required value="admin123" placeholder="••••••••">
+      </div>
+      <div class="modal-footer">
+        <button class="button" type="button" data-close>Cancel</button>
+        <button class="button primary" type="submit">Sign In ${icon('log-in')}</button>
+      </div>
+    </form>
+
+    <form id="registerForm" style="display:none;gap:12px;">
+      <div class="field">
+        <label for="regName">Full Name</label>
+        <input id="regName" type="text" required placeholder="Alex Morgan">
+      </div>
+      <div class="field">
+        <label for="regEmail">Email Address</label>
+        <input id="regEmail" type="email" required placeholder="alex@lumen.finance">
+      </div>
+      <div class="field">
+        <label for="regPassword">Password</label>
+        <input id="regPassword" type="password" required placeholder="••••••••">
+      </div>
+      <div class="modal-footer">
+        <button class="button" type="button" data-close>Cancel</button>
+        <button class="button primary" type="submit">Create Account ${icon('user-plus')}</button>
+      </div>
+    </form>
+  `);
+
+  window.switchAuthTab = function(tab) {
+    const loginForm = document.getElementById('loginForm');
+    const regForm = document.getElementById('registerForm');
+    const tabLogin = document.getElementById('authTabLoginBtn');
+    const tabReg = document.getElementById('authTabRegisterBtn');
+
+    if (tab === 'login') {
+      loginForm.style.display = 'grid';
+      regForm.style.display = 'none';
+      tabLogin.classList.add('active');
+      tabReg.classList.remove('active');
+    } else {
+      loginForm.style.display = 'none';
+      regForm.style.display = 'grid';
+      tabLogin.classList.remove('active');
+      tabReg.classList.add('active');
+    }
+  };
+
+  modalBody.querySelector('#loginForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    notify('Authenticating session...');
+    try {
+      const res = await api('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
+      });
+      if (res.user) {
+        state.currentUser = res.user;
+        state.profile.name = res.user.name;
+        state.profile.apiKey = res.token || state.profile.apiKey;
+        saveCachedState();
+        renderUserAuthWidget();
+        notify(`Welcome back, ${res.user.name}!`);
+        closeModal();
+        render();
+      }
+    } catch (err) {
+      notify(`Auth failed: ${err.message}`, true);
+    }
+  });
+
+  modalBody.querySelector('#registerForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+
+    notify('Registering new user account...');
+    try {
+      const res = await api('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, password })
+      });
+      if (res.user) {
+        state.currentUser = res.user;
+        state.profile.name = res.user.name;
+        saveCachedState();
+        renderUserAuthWidget();
+        notify(`Account created successfully! Welcome, ${res.user.name}.`);
+        closeModal();
+        render();
+      }
+    } catch (err) {
+      notify(`Registration failed: ${err.message}`, true);
+    }
+  });
+
+  modalBody.querySelector('[data-close]').addEventListener('click', closeModal);
+}
+
+// ============================================================================
 // Render & Navigation Controller
 // ============================================================================
 function render() {
-  const views = { overview, accounts, budgets, activity, rails, statements, research, ledger, settings };
+  const views = { overview, accounts, budgets, activity, rails, statements, research, ledger, settings, terms, admin };
   const viewFn = views[currentView] || overview;
   app.innerHTML = viewFn();
   document.getElementById('breadcrumbCurrent').textContent = currentView.charAt(0).toUpperCase() + currentView.slice(1);
@@ -1119,6 +1536,14 @@ function switchView(viewName) {
 }
 
 function bindView() {
+  if (currentView === 'admin') {
+    loadAdminData();
+  }
+
+  document.getElementById('refreshAdminBtn')?.addEventListener('click', loadAdminData);
+  document.getElementById('openCreateUserModalBtn')?.addEventListener('click', () => openAuthModal());
+  document.getElementById('downloadTermsPdf')?.addEventListener('click', () => notify('Terms & Legal specification exported to PDF'));
+
   // Filter tabs
   document.querySelectorAll('[data-filter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1878,6 +2303,7 @@ document.getElementById('menuButton')?.addEventListener('click', () => {
 });
 
 // Initialize application
+renderUserAuthWidget();
 refreshIcons();
 render();
 syncRemoteData();

@@ -2,7 +2,7 @@
 // Chart of Accounts & Accounting Normal Balance Classification
 // GAAP / IFRS Standard Classifications and Trial Balance Reporting
 // ============================================================================
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use rust_decimal::prelude::*;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -25,6 +25,7 @@ pub enum NormalBalance {
     Credit,
 }
 
+#[allow(dead_code)]
 impl AccountClass {
     pub fn normal_balance(&self) -> NormalBalance {
         match self {

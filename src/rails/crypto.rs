@@ -2,7 +2,7 @@
 // On-Chain Web3 Crypto Engine & Celo Payment Rail Connector in Rust
 // Native EVM RPC, cUSD/CELO low-fee micro-transactions, Buy/Sell On-Ramp
 // ============================================================================
-use crate::ledger::core::{get_account_balance, record_income, record_spending, TransactionResult};
+use crate::ledger::core::{get_account_balance, record_income, record_spending};
 use rusqlite::{params, Connection};
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
@@ -10,7 +10,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
+#[allow(dead_code)]
 pub const CELO_MAINNET_RPC: &str = "https://forno.celo.org";
+#[allow(dead_code)]
 pub const CELO_ALFAJORES_RPC: &str = "https://alfajores-forno.celo-testnet.org";
 
 pub const CUSD_CONTRACT: &str = "0x765DE81E792941687374BEB5529148722b545d13";

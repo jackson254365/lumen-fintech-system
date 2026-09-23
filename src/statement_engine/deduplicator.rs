@@ -3,7 +3,7 @@
 // SHA-256 fingerprint matching and fuzzy temporal window deduplication
 // ============================================================================
 use super::parser::ParsedTransaction;
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 

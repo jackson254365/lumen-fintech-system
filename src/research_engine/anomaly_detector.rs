@@ -2,7 +2,7 @@
 // Statistical Anomaly & Fraud Detection Engine in Rust
 // Z-Score and Interquartile Range (IQR) outlier detection for cash drain anomalies
 // ============================================================================
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 

@@ -2,7 +2,7 @@
 // Airtel Money Payment Rail Connector in Rust
 // Airtel Money API: Collection, Disbursement, and Ledger Integration
 // ============================================================================
-use crate::ledger::core::{get_account_balance, record_income, record_spending, TransactionResult};
+use crate::ledger::core::{get_account_balance, record_spending};
 use rusqlite::{params, Connection};
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;

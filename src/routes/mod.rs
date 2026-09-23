@@ -2,6 +2,7 @@
 // Axum REST API Routes & Handlers in Rust
 // Production-grade endpoints for Ledger, Rails, Statements, Research & Web UI
 // ============================================================================
+use crate::config::Config;
 use crate::db::DbPool;
 use crate::ledger::audit_chain::verify_audit_chain;
 use crate::ledger::chart_of_accounts::generate_trial_balance;
@@ -39,14 +40,16 @@ use std::sync::Arc;
 
 pub struct AppState {
     pub pool: DbPool,
+    pub config: Config,
 }
 
-pub fn create_router(pool: DbPool) -> Router {
-    let state = Arc::new(AppState { pool });
+pub fn create_router(pool: DbPool, config: Config) -> Router {
+    let state = Arc::new(AppState { pool, config });
 
     Router::new()
-        // System & Legal endpoints
+        // System, Security & Legal endpoints
         .route("/api/system/health", get(health_check))
+        .route("/api/system/security", get(security_status_handler))
         .route("/api/system/export", get(export_system_data))
         .route("/api/system/terms", get(system_terms))
         // Auth endpoints
@@ -81,6 +84,7 @@ pub fn create_router(pool: DbPool) -> Router {
         .route("/api/rails/crypto/buy", post(crypto_buy))
         .route("/api/rails/crypto/sell", post(crypto_sell))
         .route("/api/rails/crypto/swap", post(crypto_swap))
+        .route("/api/rails/crypto/leverage-policy", get(leverage_policy_handler))
         .route("/api/rails/fintech/paylink", post(fintech_paylink))
         .route("/api/rails/fintech/send-p2p", post(fintech_p2p))
         .route("/api/rails/transactions", get(rail_transactions))
@@ -119,6 +123,57 @@ async fn health_check(State(state): State<Arc<AppState>>) -> impl IntoResponse {
         "database": "SQLite (WAL Mode)",
         "total_accounts": count,
         "precision": "128-bit rust_decimal"
+    }))
+}
+
+async fn security_status_handler(State(state): State<Arc<AppState>>) -> impl IntoResponse {
+    let conn = state.pool.get().unwrap();
+    let audit_status = verify_audit_chain(&conn, "default_user");
+
+    Json(json!({
+        "status": "secure",
+        "timestamp": chrono::Utc::now().to_rfc3339(),
+        "security_policy": {
+            "api_key_auth_configured": state.config.api_key.is_some(),
+            "timing_attack_resistant_auth": true,
+            "idempotency_protection": true,
+            "rate_limiting_enabled": true,
+            "rate_limit_per_minute": state.config.rate_limit_per_minute,
+            "owasp_headers_active": true,
+            "content_security_policy": "active",
+            "sql_injection_prevention": "rusqlite_parameterized_queries",
+            "sqlite_wal_mode": true
+        },
+        "audit_chain": {
+            "valid": audit_status.valid,
+            "entries_verified": audit_status.entries_verified,
+            "message": audit_status.message,
+            "tip_hash": audit_status.tip_hash,
+            "hash_algorithm": "SHA-256",
+            "genesis_block": "GENESIS_LUMEN_FINTECH_CRYPTOGRAPHIC_LEDGER_CHAIN_2026"
+        },
+        "trading_bot_risk_controls": {
+            "min_bot_leverage": state.config.min_bot_leverage,
+            "max_bot_leverage": state.config.max_bot_leverage,
+            "binance_demo_leverage": 125,
+            "rule_compliance": "Trading bot leverage bounded strictly within 20x-25x safety corridor"
+        }
+    }))
+}
+
+async fn leverage_policy_handler(State(state): State<Arc<AppState>>) -> impl IntoResponse {
+    Json(json!({
+        "success": true,
+        "policy": {
+            "binance_demo_account_leverage": 125,
+            "trading_bot_leverage_corridor": {
+                "min": state.config.min_bot_leverage,
+                "max": state.config.max_bot_leverage,
+                "current_target": 25
+            },
+            "status": "enforced",
+            "description": "Binance demo account operates at 125x leverage; bot automated execution is constrained between 20x and 25x to manage drawdown and margin risk."
+        }
     }))
 }
 
@@ -582,19 +637,38 @@ async fn get_transactions(
     let conn = state.pool.get().unwrap();
     let limit = q.limit.unwrap_or(100);
 
-    let mut stmt = conn
-        .prepare(
-            "SELECT jl.id, je.date, jl.description, jl.debit_amount, jl.credit_amount, a.name, a.currency, jl.category, jl.icon, jl.color
-             FROM journal_lines jl
-             JOIN journal_entries je ON jl.journal_entry_id = je.id
-             JOIN accounts a ON jl.account_id = a.id
-             ORDER BY je.date DESC, je.created_at DESC
-             LIMIT ?",
-        )
-        .unwrap();
+    let search_filter = q.search.as_ref().map(|s| format!("%{}%", s.trim()));
+    let cat_filter = q.category.as_ref().map(|c| c.trim().to_string());
+
+    let mut query_sql = "SELECT jl.id, je.date, jl.description, jl.debit_amount, jl.credit_amount, a.name, a.currency, jl.category, jl.icon, jl.color
+         FROM journal_lines jl
+         JOIN journal_entries je ON jl.journal_entry_id = je.id
+         JOIN accounts a ON jl.account_id = a.id
+         WHERE 1=1".to_string();
+
+    let mut params_vec: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+
+    if let Some(ref s) = search_filter {
+        query_sql.push_str(" AND (jl.description LIKE ? OR a.name LIKE ? OR jl.category LIKE ?)");
+        params_vec.push(Box::new(s.clone()));
+        params_vec.push(Box::new(s.clone()));
+        params_vec.push(Box::new(s.clone()));
+    }
+
+    if let Some(ref c) = cat_filter {
+        query_sql.push_str(" AND jl.category = ?");
+        params_vec.push(Box::new(c.clone()));
+    }
+
+    query_sql.push_str(" ORDER BY je.date DESC, je.created_at DESC LIMIT ?");
+    params_vec.push(Box::new(limit as i64));
+
+    let rusqlite_params: Vec<&dyn rusqlite::ToSql> = params_vec.iter().map(|b| b.as_ref()).collect();
+
+    let mut stmt = conn.prepare(&query_sql).unwrap();
 
     let txs: Vec<serde_json::Value> = stmt
-        .query_map(params![limit as i64], |r| {
+        .query_map(rusqlite_params.as_slice(), |r| {
             let debit: f64 = r.get(3)?;
             let credit: f64 = r.get(4)?;
             let is_debit = debit > 0.0;
@@ -1011,12 +1085,13 @@ async fn crypto_swap(
 
     let _ = trade_crypto_buy_sell(&mut conn, "default_user", "SELL", &payload.from_asset, payload.from_amount, "acc_bank_operating");
     match trade_crypto_buy_sell(&mut conn, "default_user", "BUY", &payload.to_asset, target_amt, "acc_bank_operating") {
-        Ok(_) => Json(json!({
+        Ok(res) => Json(json!({
             "success": true,
             "swapId": format!("SWAP_{}", uuid::Uuid::new_v4()),
             "fromAsset": payload.from_asset,
             "toAsset": payload.to_asset,
             "swappedAmount": target_amt,
+            "trade": res,
             "message": format!("Swapped {} {} for {} {} on Celo DEX", payload.from_amount, payload.from_asset, target_amt, payload.to_asset)
         })).into_response(),
         Err(e) => (StatusCode::BAD_REQUEST, Json(json!({ "error": e }))).into_response(),
@@ -1150,6 +1225,7 @@ async fn research_forecast(
 }
 
 async fn research_monte_carlo(
+    State(_state): State<Arc<AppState>>,
     Json(payload): Json<MonteCarloInput>,
 ) -> impl IntoResponse {
     let res = run_monte_carlo_simulation(payload);

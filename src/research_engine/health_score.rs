@@ -2,7 +2,7 @@
 // Financial Health Score & Ratio Diagnostic Engine in Rust
 // Altman Z-Score & Corporate Liquidity Health Matrix (0 - 100 Score)
 // ============================================================================
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 

@@ -1094,6 +1094,59 @@ function settings() {
           <option value="CHF" ${state.profile.currency === 'CHF' ? 'selected' : ''}>CHF · Swiss Franc (CHF)</option>
         </select>
       </div>
+    </section>
+
+    <section class="panel panel-block" style="margin-top:18px">
+      <div class="panel-head">
+        <div>
+          <h2 class="section-title">Security & Algorithmic Risk Governance</h2>
+          <p class="panel-kicker">Multi-layer API protections, double-entry immutability, and trading bot leverage limits</p>
+        </div>
+        <span class="badge-pill success">${icon('shield-check')} Active & Enforced</span>
+      </div>
+      <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 16px;">
+        <div class="stat-card" style="padding:14px;background:var(--card-bg, #181b20);border-radius:10px;border:1px solid var(--border, #2d333b)">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Trading Bot Leverage</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent,#6366f1);margin-top:4px">20x – 25x</div>
+          <div style="font-size:11px;color:var(--text-muted,#8b949e);margin-top:2px">Strict bot safety corridor</div>
+        </div>
+        <div class="stat-card" style="padding:14px;background:var(--card-bg, #181b20);border-radius:10px;border:1px solid var(--border, #2d333b)">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Binance Demo Leverage</div>
+          <div style="font-size:20px;font-weight:700;color:#eab308;margin-top:4px">125x</div>
+          <div style="font-size:11px;color:var(--text-muted,#8b949e);margin-top:2px">Demo account max limit</div>
+        </div>
+        <div class="stat-card" style="padding:14px;background:var(--card-bg, #181b20);border-radius:10px;border:1px solid var(--border, #2d333b)">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Anti-DoS Rate Limit</div>
+          <div style="font-size:20px;font-weight:700;color:#10b981;margin-top:4px">120 req/min</div>
+          <div style="font-size:11px;color:var(--text-muted,#8b949e);margin-top:2px">Financial mutations: 30/min</div>
+        </div>
+        <div class="stat-card" style="padding:14px;background:var(--card-bg, #181b20);border-radius:10px;border:1px solid var(--border, #2d333b)">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Audit Chain Immutability</div>
+          <div style="font-size:20px;font-weight:700;color:#38bdf8;margin-top:4px">SHA-256</div>
+          <div style="font-size:11px;color:var(--text-muted,#8b949e);margin-top:2px">Cryptographic hash linked</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <strong>Timing-Attack-Resistant Auth</strong>
+          <p>Constant-time byte comparison on <code>x-api-key</code> and Bearer tokens</p>
+        </div>
+        <span class="badge-pill success" style="font-size:11px">${icon('lock')} Enabled</span>
+      </div>
+      <div class="settings-row">
+        <div>
+          <strong>Idempotency Deduplication Guard</strong>
+          <p>Automatic replay protection via <code>X-Idempotency-Key</code> on financial mutations</p>
+        </div>
+        <span class="badge-pill success" style="font-size:11px">${icon('check-circle-2')} Enabled</span>
+      </div>
+      <div class="settings-row">
+        <div>
+          <strong>OWASP Hardened Response Headers</strong>
+          <p>Content-Security-Policy, HSTS, X-Content-Type-Options: nosniff, X-Frame-Options: DENY</p>
+        </div>
+        <span class="badge-pill success" style="font-size:11px">${icon('shield')} Enabled</span>
+      </div>
     </section>`;
 }
 

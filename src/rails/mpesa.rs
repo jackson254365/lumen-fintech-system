@@ -2,7 +2,7 @@
 // M-Pesa Payment Rail Connector in Rust
 // Daraja STK Push, Callback handling, and B2C Payouts with ledger integration
 // ============================================================================
-use crate::ledger::core::{get_account_balance, record_income, record_spending, TransactionResult};
+use crate::ledger::core::{get_account_balance, record_spending};
 use rusqlite::{params, Connection};
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;

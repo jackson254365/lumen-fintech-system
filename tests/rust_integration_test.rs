@@ -149,3 +149,50 @@ fn test_user_auth_and_admin_system() {
         .unwrap();
     assert!(admin_exists, "Admin user must exist in users table");
 }
+
+#[test]
+fn test_security_mechanisms_and_leverage_corridor() {
+    use lumen_fintech_system::middleware::auth::{constant_time_eq, IdempotencyStore};
+    use lumen_fintech_system::middleware::rate_limiter::RateLimiter;
+    use lumen_fintech_system::middleware::validation::{
+        sanitize_input_text, validate_bot_leverage, validate_transaction_amount,
+    };
+
+    // 1. Constant-Time API Key Comparison
+    assert!(constant_time_eq(b"secret_api_key_123", b"secret_api_key_123"));
+    assert!(!constant_time_eq(b"secret_api_key_123", b"wrong_api_key_456"));
+    assert!(!constant_time_eq(b"short", b"longer_key"));
+
+    // 2. Idempotency Key deduplication
+    let idem_store = IdempotencyStore::new();
+    assert!(idem_store.check_and_record("req_idem_key_abc_123"));
+    // Second attempt with same key must return false (duplicate detected)
+    assert!(!idem_store.check_and_record("req_idem_key_abc_123"));
+    // Different key must succeed
+    assert!(idem_store.check_and_record("req_idem_key_xyz_789"));
+
+    // 3. Rate Limiter Token Bucket
+    let limiter = RateLimiter::new(20);
+    let (limit, remaining) = limiter.check("192.168.1.50", false).unwrap();
+    assert_eq!(limit, 20);
+    assert_eq!(remaining, 19);
+
+    // 4. Trading Bot Leverage Guard: 20x-25x Corridor rule
+    // Inside corridor (20x - 25x) -> Valid
+    assert!(validate_bot_leverage(20, 20, 25).is_ok());
+    assert!(validate_bot_leverage(22, 20, 25).is_ok());
+    assert!(validate_bot_leverage(25, 20, 25).is_ok());
+    // Below corridor (< 20x) -> Rejected
+    assert!(validate_bot_leverage(10, 20, 25).is_err());
+    // Above corridor (> 25x, e.g. 50x or 125x) -> Rejected for bot execution
+    assert!(validate_bot_leverage(50, 20, 25).is_err());
+    assert!(validate_bot_leverage(125, 20, 25).is_err());
+
+    // 5. Transaction amount validation and text sanitization
+    assert!(validate_transaction_amount(dec!(100.0), dec!(1000000.0)).is_ok());
+    assert!(validate_transaction_amount(dec!(-5.0), dec!(1000000.0)).is_err());
+    assert!(validate_transaction_amount(dec!(2000000.0), dec!(1000000.0)).is_err());
+
+    let sanitized = sanitize_input_text("  Payment for \x00Server\x1b Hosting  ");
+    assert_eq!(sanitized, "Payment for Server Hosting");
+}

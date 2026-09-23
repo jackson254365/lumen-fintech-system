@@ -2,7 +2,7 @@
 // Recurring Payment & Subscription Detection Engine in Rust
 // Identifies recurring SaaS, utility, and vendor billings with period analysis
 // ============================================================================
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 

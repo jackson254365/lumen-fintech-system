@@ -368,6 +368,7 @@ pub fn record_income(
 }
 
 /// Calculates Trial Balance proving sum(Debits) == sum(Credits)
+#[allow(dead_code)]
 pub fn get_trial_balance(conn: &Connection, user_id: &str) -> TrialBalanceSummary {
     let mut stmt = conn
         .prepare(

@@ -2,7 +2,7 @@
 // Bank Wire Payment Rail Connector (SWIFT / SEPA / ACH) in Rust
 // International & Local Bank Transfers, Wire Instructions, ISO 20022 messaging
 // ============================================================================
-use crate::ledger::core::{get_account_balance, record_income, record_spending, TransactionResult};
+use crate::ledger::core::{get_account_balance, record_spending};
 use rusqlite::{params, Connection};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};

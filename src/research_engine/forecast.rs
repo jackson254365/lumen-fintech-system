@@ -2,7 +2,7 @@
 // Computational Cash Flow Forecast Engine in Rust
 // Linear Regression & Double Exponential Smoothing for 30, 60, 90 Day Projections
 // ============================================================================
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 

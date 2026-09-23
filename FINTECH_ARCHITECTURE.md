@@ -4,7 +4,7 @@
 
 Lumen Finance is engineered as a high-performance, local-first computational finance platform and Web3 crypto engine in **Rust**. Operating on `Axum`, `Tokio`, and `rusqlite`/`r2d2`, Lumen replaces traditional double-precision floating-point ledger arithmetic with **128-bit fixed-point precision (`rust_decimal`)**, eliminating floating-point rounding errors and zero-drift drift.
 
-The core ledger enforces strict **GAAP/IFRS-compliant Double-Entry Bookkeeping** backed by an immutable **SHA-256 Cryptographic Audit Hash Chain**.
+The core ledger enforces strict **GAAP/IFRS-compliant Double-Entry Bookkeeping** backed by an immutable **SHA-256 Cryptographic Audit Hash Chain** and an **enterprise-grade Multi-Layer Security Architecture**.
 
 Every monetary movement generates balanced debits and credits ($\sum \text{Debits} \equiv \sum \text{Credits}$), preventing unrecorded fund creation, race conditions, or undetected database modification.
 
@@ -15,11 +15,19 @@ Every monetary movement generates balanced debits and credits ($\sum \text{Debit
 ```mermaid
 flowchart TD
     Client["Web Dashboard (index.html / app.js) & Python Research SDK"] -->|HTTPS / REST API| Axum["Axum Web Server (Tokio Async Router)"]
-    Axum --> Middleware["Auth & Idempotency Header Middleware"]
-    Middleware --> LedgerCore["GAAP Double-Entry Ledger Core (src/ledger/core.rs)"]
-    Middleware --> RailsManager["Multi-Rail Payment Gateway (src/rails/)"]
-    Middleware --> StatementEngine["Statement Parser & Deduplication (src/statement_engine/)"]
-    Middleware --> ResearchEngine["Computational Research Engine (src/research_engine/)"]
+    Axum --> SecurityLayer["Security Middleware Stack"]
+    
+    subgraph SecurityLayer ["Security & Governance Stack (src/middleware/)"]
+        SecurityHeaders["OWASP Security Headers (CSP, HSTS, Nosniff, Frame-Deny)"]
+        RateLimiter["Anti-DoS In-Memory Rate Limiter (Token Bucket)"]
+        AuthTiming["Timing-Resistant Auth & Idempotency Key Guard"]
+        LeverageGuard["Trading Bot Leverage Safety Guard (20x-25x Corridor)"]
+    end
+
+    SecurityLayer --> LedgerCore["GAAP Double-Entry Ledger Core (src/ledger/core.rs)"]
+    SecurityLayer --> RailsManager["Multi-Rail Payment Gateway (src/rails/)"]
+    SecurityLayer --> StatementEngine["Statement Parser & Deduplication (src/statement_engine/)"]
+    SecurityLayer --> ResearchEngine["Computational Research Engine (src/research_engine/)"]
 
     LedgerCore --> AuditChain["SHA-256 Audit Chain Auditor (src/ledger/audit_chain.rs)"]
     LedgerCore --> SQLite["Thread-Safe SQLite WAL Connection Pool (r2d2)"]
@@ -52,7 +60,33 @@ Every financial transaction is executed as an atomic `journal_entry` containing 
 
 ---
 
-## 4. Cryptographic SHA-256 Audit Chain & Immutability
+## 4. Multi-Layer Security Architecture
+
+Lumen implements comprehensive, defense-in-depth financial security:
+
+1. **Timing-Attack-Resistant Authentication (`src/middleware/auth.rs`)**:
+   - Constant-time byte array comparison (`constant_time_eq`) on `X-API-Key` and `Authorization: Bearer` headers prevents side-channel timing attacks.
+2. **Idempotency & Replay Protection (`src/middleware/auth.rs`)**:
+   - Automatic cache deduplication on `X-Idempotency-Key` or `Idempotency-Key` for mutation requests (`POST`/`PUT`) to guarantee zero duplicate financial debits.
+3. **Anti-DoS Token-Bucket Rate Limiter (`src/middleware/rate_limiter.rs`)**:
+   - In-memory sliding-window request throttling (default 120 req/min for read endpoints; 30 req/min for sensitive payment and ledger routes).
+   - Injects standard RFC `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `Retry-After` headers.
+4. **OWASP Hardened HTTP Response Headers (`src/middleware/security.rs`)**:
+   - `Content-Security-Policy`: Restricts scripts, styles, fonts, and network connections.
+   - `X-Content-Type-Options: nosniff`: Mitigates MIME confusion attacks.
+   - `X-Frame-Options: DENY`: Prevents UI clickjacking attacks.
+   - `Referrer-Policy: strict-origin-when-cross-origin`: Controls referral leakage.
+   - `Permissions-Policy: camera=(), microphone=(), geolocation=()`: Disables unused hardware device APIs.
+   - `Cache-Control: no-store, no-cache, must-revalidate, private`: Prevents browser caching of private financial API data.
+5. **Trading Bot Leverage Guard & Margin Governance (`src/middleware/validation.rs`)**:
+   - **Binance Demo Baseline**: 125x maximum exchange leverage capability.
+   - **Automated Bot Risk Envelope**: Strictly constrained within a **20x to 25x corridor**. Any automated trading bot request attempting leverage $> 25\text{x}$ or $< 20\text{x}$ is rejected at the API boundary to prevent catastrophic liquidation.
+6. **SQL Injection Defense**:
+   - Strict usage of `rusqlite` parameterized queries with no string interpolation in SQL statements.
+
+---
+
+## 5. Cryptographic SHA-256 Audit Chain & Immutability
 
 Lumen integrates SHA-256 hash chaining across all journal entries:
 
@@ -60,11 +94,11 @@ $$H_0 = \text{SHA256}(\text{"GENESIS\_LUMEN\_FINTECH\_CRYPTOGRAPHIC\_LEDGER\_CHA
 $$H_n = \text{SHA256}(H_{n-1} \parallel \text{Seq} \parallel \text{EntryID} \parallel \text{Date} \parallel \text{Description} \parallel \text{SortedPostingsJSON})$$
 
 - If any record, amount, or direction in `journal_entries` or `postings` is altered, recalculating the hash chain from genesis flags the corrupted sequence block.
-- Verified in milliseconds via `GET /api/ledger/verify-audit` or `verify_audit_chain(&conn, user_id)` in Rust.
+- Verified in milliseconds via `GET /api/ledger/verify-audit` or `GET /api/system/security` in Rust.
 
 ---
 
-## 5. Payment Rails & Celo Web3 Crypto Gateway
+## 6. Payment Rails & Celo Web3 Crypto Gateway
 
 1. **M-Pesa Rail (`src/rails/mpesa.rs`)**: Direct integration with Safaricom Daraja API for STK Push C2B top-ups and B2C automated payouts.
 2. **Airtel Money Rail (`src/rails/airtel.rs`)**: Cross-border East African mobile money collections (KES/UGX) and cashouts.
@@ -78,7 +112,7 @@ $$H_n = \text{SHA256}(H_{n-1} \parallel \text{Seq} \parallel \text{EntryID} \par
 
 ---
 
-## 6. Computational Research Engine
+## 7. Computational Research Engine
 
 - **Cash Flow Forecast (`src/research_engine/forecast.rs`)**: 30/60/90-day linear regression and double exponential smoothing with dynamic confidence bands.
 - **Monte Carlo Risk Simulation (`src/research_engine/monte_carlo.rs`)**: Stochastic Box-Muller normal distribution modeling for revenue volatility, expense shocks, and insolvency probability.
@@ -87,15 +121,20 @@ $$H_n = \text{SHA256}(H_{n-1} \parallel \text{Seq} \parallel \text{EntryID} \par
 
 ---
 
-## 7. Rust Module Organization
+## 8. Rust Module Organization
 
 ```
 src/
-├── config.rs              # System configuration & env loading
+├── config.rs              # System configuration, security policies & env loading
 ├── db.rs                  # SQLite WAL connection pooling (r2d2) & schema initialization
 ├── lib.rs                 # Library export root
-├── main.rs                # Axum HTTP server entrypoint
-├── middleware/            # Auth & security headers middleware
+├── main.rs                # Axum HTTP server entrypoint with security middleware stack
+├── middleware/            # Security, Auth, Rate Limiter, and Validation stack
+│   ├── auth.rs            # Timing-attack-resistant API key & Idempotency Store
+│   ├── mod.rs             # Middleware module exports
+│   ├── rate_limiter.rs    # In-memory sliding-window Token Bucket rate limiter
+│   ├── security.rs        # OWASP HTTP security headers (CSP, HSTS, Nosniff, etc.)
+│   └── validation.rs      # Bot leverage corridor (20x-25x) & bounds validation
 ├── ledger/
 │   ├── audit_chain.rs     # SHA-256 cryptographic auditor
 │   ├── chart_of_accounts.rs # GAAP/IFRS normal balance matrix & trial balance
@@ -110,5 +149,5 @@ src/
 │   └── mod.rs
 ├── research_engine/       # Forecast, Monte Carlo, Health Score, Anomalies
 ├── statement_engine/      # CSV/OFX parser & SHA-256 deduplicator
-└── routes/                # Axum REST API handlers
+└── routes/                # Axum REST API handlers with live telemetry
 ```
